@@ -1,0 +1,735 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qubix | Forensic Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            color: #202b3c;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            position: fixed;
+            background: #111c30;
+            color: white;
+            padding: 25px 18px;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 45px;
+        }
+
+        .logo span {
+            background: #4b5cf5;
+            padding: 8px 13px;
+            border-radius: 10px;
+            margin-right: 10px;
+        }
+
+        .menu-title {
+            color: #8290a7;
+            font-size: 12px;
+            margin: 25px 10px 12px;
+        }
+
+        .menu a {
+            display: block;
+            padding: 14px;
+            margin: 6px 0;
+            text-decoration: none;
+            color: #b9c4d5;
+            border-radius: 9px;
+            cursor: pointer;
+        }
+
+        .menu a:hover,
+        .menu a.active {
+            background: #293b59;
+            color: white;
+        }
+
+        .main {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin: 8px 0;
+        }
+
+        .subtitle {
+            color: #8792a3;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 12px 17px;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .primary {
+            background: #4557f5;
+            color: white;
+        }
+
+        .secondary {
+            background: white;
+            color: #253149;
+            border: 1px solid #dfe4ed;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card, .panel {
+            background: white;
+            padding: 22px;
+            border-radius: 15px;
+            border: 1px solid #e5e9f1;
+            box-shadow: 0 5px 20px rgba(24, 39, 68, 0.03);
+        }
+
+        .card p {
+            color: #8792a3;
+            font-size: 14px;
+        }
+
+        .number {
+            font-size: 30px;
+            font-weight: bold;
+            margin: 15px 0 8px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 22px;
+        }
+
+        .panel {
+            margin-bottom: 22px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .panel-header h3 {
+            font-size: 17px;
+        }
+
+        .case {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 17px 0;
+            border-top: 1px solid #edf0f5;
+        }
+
+        .case-icon {
+            background: #eef0ff;
+            color: #4557f5;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+
+        .case-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .case-info strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 6px;
+            overflow-wrap: anywhere;
+        }
+
+        .small {
+            font-size: 12px;
+            color: #8792a3;
+        }
+
+        .status {
+            background: #e6f8f1;
+            color: #15886c;
+            padding: 7px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .upload-area {
+            border: 2px dashed #cbd3e2;
+            background: #fafbff;
+            padding: 35px 20px;
+            text-align: center;
+            border-radius: 13px;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #4557f5;
+        }
+
+        .upload-area h3 {
+            margin: 12px 0;
+        }
+
+        .upload-area p {
+            color: #8792a3;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            color: #4557f5;
+        }
+
+        .activity {
+            display: flex;
+            gap: 12px;
+            padding: 15px 0;
+            border-top: 1px solid #edf0f5;
+            font-size: 13px;
+        }
+
+        .dot {
+            height: 10px;
+            width: 10px;
+            background: #21b6a8;
+            border-radius: 50%;
+            margin-top: 5px;
+        }
+
+        .progress {
+            height: 8px;
+            background: #edf0f6;
+            border-radius: 10px;
+            margin: 18px 0;
+            overflow: hidden;
+        }
+
+        .progress div {
+            width: 60%;
+            height: 100%;
+            background: #4557f5;
+        }
+
+        footer {
+            text-align: center;
+            color: #8792a3;
+            font-size: 12px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 1050px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 200px;
+                padding: 20px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+            }
+
+            .sidebar .menu,
+            .sidebar .menu-title {
+                display: none;
+            }
+
+            .logo {
+                margin-bottom: 0;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .header {
+                display: block;
+            }
+
+            .header button {
+                margin-top: 12px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .card, .panel {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <span>Q</span> QUBIX
+        </div>
+
+        <div class="menu-title">WORKSPACE</div>
+
+        <nav class="menu">
+            <a class="active" onclick="showSection('dashboard', this)">
+                ▦ &nbsp; Dashboard
+            </a>
+
+            <a onclick="showSection('cases', this)">
+                ▣ &nbsp; Cases
+            </a>
+
+            <a onclick="showSection('evidence', this)">
+                ⇧ &nbsp; Evidence Upload
+            </a>
+
+            <a onclick="showSection('video', this)">
+                ▷ &nbsp; Video Analysis
+            </a>
+
+            <a onclick="showSection('integrity', this)">
+                ⬡ &nbsp; Integrity Check
+            </a>
+
+            <a onclick="showSection('reports', this)">
+                ▤ &nbsp; Reports
+            </a>
+        </nav>
+
+        <div class="menu-title">SYSTEM</div>
+
+        <nav class="menu">
+            <a onclick="showSection('settings', this)">
+                ⚙ &nbsp; Settings
+            </a>
+        </nav>
+
+    </aside>
+
+    <main class="main">
+
+        <header class="header">
+            <div>
+                <p class="subtitle">QUBIX / WORKSPACE</p>
+                <h1 id="pageTitle">Forensic Dashboard</h1>
+                <p class="subtitle">
+                    Manage cases and surveillance evidence.
+                </p>
+            </div>
+
+            <div>
+                <button class="secondary"
+                    onclick="document.getElementById('fileInput').click()">
+                    + Add Evidence
+                </button>
+
+                <button class="primary" onclick="newCase()">
+                    + New Case
+                </button>
+            </div>
+        </header>
+
+        <section id="dashboard">
+
+            <div class="stats">
+
+                <div class="card">
+                    <p>Total Cases</p>
+                    <div class="number" id="caseCount">0</div>
+                    <p>Cases created</p>
+                </div>
+
+                <div class="card">
+                    <p>Evidence Files</p>
+                    <div class="number" id="evidenceCount">0</div>
+                    <p>Files selected</p>
+                </div>
+
+                <div class="card">
+                    <p>Integrity Checked</p>
+                    <div class="number" id="integrityCount">0</div>
+                    <p>Files verified</p>
+                </div>
+
+                <div class="card">
+                    <p>Reports Generated</p>
+                    <div class="number" id="reportCount">0</div>
+                    <p>Reports created</p>
+                </div>
+
+            </div>
+
+            <div class="content">
+
+                <div>
+
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h3>Recent Cases</h3>
+                            <span class="small">Case Management</span>
+                        </div>
+
+                        <div id="caseList">
+                            <p class="small">
+                                No cases created yet. Click New Case to begin.
+                            </p>
+                        </div>
+                    </section>
+
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h3>Evidence Workspace</h3>
+                        </div>
+
+                        <label class="upload-area" for="fileInput">
+                            <div class="upload-icon">⇧</div>
+                            <h3>Upload CCTV Evidence</h3>
+                            <p>
+                                Select video or evidence files from your device.
+                            </p>
+                            <span style="color:#4557f5;font-weight:bold">
+                                Browse Files
+                            </span>
+                        </label>
+
+                        <input
+                            type="file"
+                            id="fileInput"
+                            accept="video/*,.dav,.264,.265"
+                            multiple
+                            hidden
+                            onchange="uploadFiles(this.files)"
+                        >
+
+                        <div id="fileList"></div>
+                    </section>
+
+                </div>
+
+                <div>
+
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h3>Case Progress</h3>
+                        </div>
+
+                        <p class="small">Evidence review progress</p>
+
+                        <div class="progress">
+                            <div></div>
+                        </div>
+
+                        <p class="small">
+                            Progress will be updated as case features are added.
+                        </p>
+                    </section>
+
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h3>Recent Activity</h3>
+                        </div>
+
+                        <div id="activityList">
+                            <p class="small">No recent activity.</p>
+                        </div>
+                    </section>
+
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h3>Evidence Integrity</h3>
+                        </div>
+
+                        <p class="small">
+                            Verify evidence integrity using SHA-256 hashing.
+                            A backend connection is required for actual
+                            hash calculation.
+                        </p>
+
+                        <br>
+
+                        <button class="secondary"
+                            onclick="showSection('integrity')">
+                            Open Integrity Check
+                        </button>
+                    </section>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section id="otherSection" style="display:none">
+            <div class="panel">
+                <h3 id="sectionHeading">Section</h3>
+                <br>
+                <p class="subtitle" id="sectionDescription"></p>
+                <br>
+                <button class="secondary"
+                    onclick="showSection('dashboard')">
+                    Back to Dashboard
+                </button>
+            </div>
+        </section>
+
+        <footer>
+            Qubix Forensic Analysis Tool
+        </footer>
+
+    </main>
+
+    <script>
+
+        let caseNumber = 1;
+        let evidenceNumber = 0;
+        let integrityNumber = 0;
+        let reportNumber = 0;
+
+        function newCase() {
+
+            let name = prompt("Enter the case name:");
+
+            if (name === null || name.trim() === "") {
+                return;
+            }
+
+            let caseList = document.getElementById("caseList");
+
+            if (caseNumber === 1) {
+                caseList.innerHTML = "";
+            }
+
+            let caseId = "CASE-" +
+                String(caseNumber).padStart(3, "0");
+
+            let div = document.createElement("div");
+            div.className = "case";
+
+            let icon = document.createElement("span");
+            icon.className = "case-icon";
+            icon.textContent = "▣";
+
+            let info = document.createElement("div");
+            info.className = "case-info";
+
+            let title = document.createElement("strong");
+            title.textContent = caseId + " - " + name;
+
+            let details = document.createElement("span");
+            details.className = "small";
+            details.textContent = "Created just now";
+
+            info.appendChild(title);
+            info.appendChild(details);
+
+            let status = document.createElement("span");
+            status.className = "status";
+            status.textContent = "New";
+
+            div.appendChild(icon);
+            div.appendChild(info);
+            div.appendChild(status);
+
+            caseList.prepend(div);
+
+            caseNumber++;
+
+            document.getElementById("caseCount").textContent =
+                caseNumber - 1;
+
+            addActivity("New case created: " + name);
+        }
+
+        function uploadFiles(files) {
+
+            let fileList = document.getElementById("fileList");
+
+            for (let file of files) {
+
+                let div = document.createElement("div");
+                div.className = "case";
+
+                let icon = document.createElement("span");
+                icon.className = "case-icon";
+                icon.textContent = "▤";
+
+                let info = document.createElement("div");
+                info.className = "case-info";
+
+                let title = document.createElement("strong");
+                title.textContent = file.name;
+
+                let details = document.createElement("span");
+                details.className = "small";
+
+                details.textContent =
+                    (file.size / (1024 * 1024)).toFixed(2) +
+                    " MB · Selected locally";
+
+                info.appendChild(title);
+                info.appendChild(details);
+
+                let status = document.createElement("span");
+                status.className = "status";
+                status.textContent = "Selected";
+
+                div.appendChild(icon);
+                div.appendChild(info);
+                div.appendChild(status);
+
+                fileList.prepend(div);
+
+                evidenceNumber++;
+
+                addActivity("Evidence selected: " + file.name);
+            }
+
+            document.getElementById("evidenceCount").textContent =
+                evidenceNumber;
+
+            document.getElementById("fileInput").value = "";
+        }
+
+        function addActivity(message) {
+
+            let activityList =
+                document.getElementById("activityList");
+
+            if (activityList.querySelector(".small")) {
+                activityList.innerHTML = "";
+            }
+
+            let div = document.createElement("div");
+            div.className = "activity";
+
+            let dot = document.createElement("span");
+            dot.className = "dot";
+
+            let text = document.createElement("span");
+            text.textContent = message;
+
+            div.appendChild(dot);
+            div.appendChild(text);
+
+            activityList.prepend(div);
+        }
+
+        function showSection(section, element) {
+
+            document.querySelectorAll(".menu a").forEach(link => {
+                link.classList.remove("active");
+            });
+
+            if (element) {
+                element.classList.add("active");
+            }
+
+            let dashboard = document.getElementById("dashboard");
+            let otherSection = document.getElementById("otherSection");
+
+            if (section === "dashboard") {
+
+                dashboard.style.display = "block";
+                otherSection.style.display = "none";
+
+                document.getElementById("pageTitle").textContent =
+                    "Forensic Dashboard";
+
+                return;
+            }
+
+            dashboard.style.display = "none";
+            otherSection.style.display = "block";
+
+            let titles = {
+                cases: "Case Management",
+                evidence: "Evidence Upload",
+                video: "Video Analysis",
+                integrity: "Evidence Integrity",
+                reports: "Forensic Reports",
+                settings: "Settings"
+            };
+
+            let descriptions = {
+                cases: "Create and organize investigation cases.",
+                evidence: "Select surveillance files for your case.",
+                video: "Video processing and examination features can be connected here.",
+                integrity: "SHA-256 evidence verification requires backend implementation.",
+                reports: "Generate and manage forensic examination reports.",
+                settings: "Application settings and preferences."
+            };
+
+            document.getElementById("pageTitle").textContent =
+                titles[section] || "Workspace";
+
+            document.getElementById("sectionHeading").textContent =
+                titles[section] || "Workspace";
+
+            document.getElementById("sectionDescription").textContent =
+                descriptions[section] || "";
+        }
+
+    </script>
+
+</body>
+</html>
