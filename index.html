@@ -2,742 +2,750 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qubix | Forensic Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qubix | Forensic Dashboard</title>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Segoe UI", Arial, sans-serif;
-        }
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Segoe UI,Arial,sans-serif}
+:root{--navy:#111c30;--blue:#4b5cf5;--bg:#f3f6fb;--ink:#202b3c;--muted:#8490a4;--line:#e5eaf2}
+body{background:var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0;border-radius:9px;padding:11px 16px;font-weight:600}
+.primary{background:var(--blue);color:white}
+.secondary{background:white;border:1px solid var(--line);color:var(--ink)}
+.danger{background:#fff0f0;color:#bf3434}
+.hidden{display:none!important}
 
-        body {
-            background: #f4f6fb;
-            color: #202b3c;
-        }
+#loginPage{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--navy)}
+.login-card{background:white;width:min(430px,100%);padding:36px;border-radius:20px}
+.brand{font-size:25px;font-weight:800;margin-bottom:15px}
+.brand span{background:var(--blue);color:white;padding:8px 12px;border-radius:10px;margin-right:8px}
+.login-card h1{margin:25px 0 8px}
+.muted,.small{color:var(--muted);font-size:13px;line-height:1.6}
+.field{margin:18px 0}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:8px}
+.field input,.field textarea,.field select{width:100%;padding:13px;border:1px solid #dce2ed;border-radius:9px;background:#fbfcff}
+.field textarea{resize:vertical}
 
-        .sidebar {
-            width: 240px;
-            height: 100vh;
-            position: fixed;
-            background: #111c30;
-            color: white;
-            padding: 25px 18px;
-        }
+.sidebar{position:fixed;inset:0 auto 0 0;width:245px;background:var(--navy);color:white;padding:25px 17px}
+.sidebar .brand{margin:0 8px 40px}
+.menu-label{font-size:11px;color:#8190a9;margin:25px 12px 10px}
+.nav a{display:block;color:#b8c3d5;text-decoration:none;padding:13px 14px;border-radius:9px;margin:5px 0;cursor:pointer;font-size:14px}
+.nav a:hover,.nav a.active{background:#263956;color:white}
 
-        .logo {
-            font-size: 25px;
-            font-weight: bold;
-            margin-bottom: 45px;
-        }
+.main{margin-left:245px;padding:30px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:28px}
+.topbar h1{font-size:27px;margin:7px 0}
+.eyebrow{font-size:12px;color:var(--muted);letter-spacing:1px}
+.user-chip{display:flex;align-items:center;gap:10px;background:white;padding:9px 13px;border:1px solid var(--line);border-radius:12px}
+.avatar{background:#e9ebff;color:var(--blue);font-weight:800;border-radius:50%;width:36px;height:36px;display:grid;place-items:center}
 
-        .logo span {
-            background: #4b5cf5;
-            padding: 8px 13px;
-            border-radius: 10px;
-            margin-right: 10px;
-        }
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+.card,.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:21px;margin-bottom:20px}
+.card p{font-size:13px;color:var(--muted)}
+.metric{font-size:30px;font-weight:800;margin:13px 0 5px}
+.layout,.video-layout{display:grid;grid-template-columns:1.5fr 1fr;gap:20px}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px}
+.panel h3{font-size:17px}
+.page{display:none}
+.page.active{display:block}
+.page-title{font-size:25px;margin-bottom:7px}
+.page-intro{color:var(--muted);margin-bottom:22px;font-size:14px}
 
-        .menu-title {
-            color: #8290a7;
-            font-size: 12px;
-            margin: 25px 10px 12px;
-        }
+.case-row,.file-row{display:flex;align-items:center;gap:13px;padding:15px 0;border-top:1px solid #edf0f5}
+.case-symbol{background:#eef0ff;color:var(--blue);padding:12px;border-radius:10px}
+.case-info{flex:1;min-width:0}
+.case-info strong{display:block;font-size:14px;overflow-wrap:anywhere;margin-bottom:5px}
+.pill{background:#e7f8f2;color:#16866b;padding:6px 9px;border-radius:30px;font-size:11px}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.actions button{padding:7px 10px;font-size:12px}
 
-        .menu a {
-            display: block;
-            padding: 14px;
-            margin: 6px 0;
-            text-decoration: none;
-            color: #b9c4d5;
-            border-radius: 9px;
-            cursor: pointer;
-        }
+.dropzone{display:block;border:2px dashed #cbd4e3;border-radius:13px;background:#fafbff;text-align:center;padding:30px 15px;cursor:pointer}
+.dropzone:hover{border-color:var(--blue)}
+.dropzone .symbol{font-size:30px;color:var(--blue);margin-bottom:10px}
 
-        .menu a:hover,
-        .menu a.active {
-            background: #293b59;
-            color: white;
-        }
+.activity{padding:13px 0;border-top:1px solid #edf0f5;font-size:13px;display:flex;gap:10px}
+.dot{width:9px;height:9px;background:#18a999;border-radius:50%;margin-top:5px;flex-shrink:0}
+.case-form{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.case-form .full{grid-column:1/-1}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:13px 10px;border-bottom:1px solid var(--line)}
+th{color:var(--muted)}
 
-        .main {
-            margin-left: 240px;
-            padding: 30px;
-        }
+.video-stage{background:#101827;border-radius:12px;min-height:250px;display:grid;place-items:center;overflow:hidden;color:white}
+.video-stage video{width:100%;max-height:480px;background:#101827}
+.video-placeholder{text-align:center;padding:30px;color:#b7c3d5}
+.control{margin:20px 0}
+.control label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:9px}
+.control input{width:100%;accent-color:var(--blue)}
+.video-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+.video-buttons button{font-size:13px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            gap: 20px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            margin: 8px 0;
-        }
-
-        .subtitle {
-            color: #8792a3;
-            font-size: 14px;
-        }
-
-        button {
-            padding: 12px 17px;
-            border: none;
-            border-radius: 9px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .primary {
-            background: #4557f5;
-            color: white;
-        }
-
-        .secondary {
-            background: white;
-            color: #253149;
-            border: 1px solid #dfe4ed;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-            margin-bottom: 25px;
-        }
-
-        .card, .panel {
-            background: white;
-            padding: 22px;
-            border-radius: 15px;
-            border: 1px solid #e5e9f1;
-            box-shadow: 0 5px 20px rgba(24, 39, 68, 0.03);
-        }
-
-        .card p {
-            color: #8792a3;
-            font-size: 14px;
-        }
-
-        .number {
-            font-size: 30px;
-            font-weight: bold;
-            margin: 15px 0 8px;
-        }
-
-        .content {
-            display: grid;
-            grid-template-columns: 1.6fr 1fr;
-            gap: 22px;
-        }
-
-        .panel {
-            margin-bottom: 22px;
-        }
-
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 18px;
-        }
-
-        .panel-header h3 {
-            font-size: 17px;
-        }
-
-        .case {
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            padding: 17px 0;
-            border-top: 1px solid #edf0f5;
-        }
-
-        .case-icon {
-            background: #eef0ff;
-            color: #4557f5;
-            padding: 13px;
-            border-radius: 10px;
-            font-size: 18px;
-        }
-
-        .case-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .case-info strong {
-            display: block;
-            font-size: 14px;
-            margin-bottom: 6px;
-            overflow-wrap: anywhere;
-        }
-
-        .small {
-            font-size: 12px;
-            color: #8792a3;
-        }
-
-        .status {
-            background: #e6f8f1;
-            color: #15886c;
-            padding: 7px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            white-space: nowrap;
-        }
-.upload-area {
-    border: 2px dashed #cbd3e2;
-    background: #fafbff;
-    padding: 35px 20px;
-    text-align: center;
-    border-radius: 13px;
-    cursor: pointer;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    width: 100%;
-    gap: 12px;
+@media(max-width:1100px){
+.sidebar{width:210px}.main{margin-left:210px;padding:22px}
+.stats{grid-template-columns:repeat(2,1fr)}
+.layout,.video-layout{grid-template-columns:1fr}
 }
-         
-
-        .upload-area:hover {
-            border-color: #4557f5;
-        }
-
-        .upload-area h3 {
-            margin: 12px 0;
-        }
-
-        .upload-area p {
-            color: #8792a3;
-            font-size: 13px;
-            margin-bottom: 15px;
-        }
-
-        .upload-icon {
-            font-size: 32px;
-            color: #4557f5;
-        }
-
-        .activity {
-            display: flex;
-            gap: 12px;
-            padding: 15px 0;
-            border-top: 1px solid #edf0f5;
-            font-size: 13px;
-        }
-
-        .dot {
-            height: 10px;
-            width: 10px;
-            background: #21b6a8;
-            border-radius: 50%;
-            margin-top: 5px;
-        }
-
-        .progress {
-            height: 8px;
-            background: #edf0f6;
-            border-radius: 10px;
-            margin: 18px 0;
-            overflow: hidden;
-        }
-
-        .progress div {
-            width: 60%;
-            height: 100%;
-            background: #4557f5;
-        }
-
-        footer {
-            text-align: center;
-            color: #8792a3;
-            font-size: 12px;
-            margin-top: 30px;
-        }
-
-        @media (max-width: 1050px) {
-            .sidebar {
-                width: 200px;
-            }
-
-            .main {
-                margin-left: 200px;
-                padding: 20px;
-            }
-
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .content {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 650px) {
-            .sidebar {
-                position: static;
-                width: 100%;
-                height: auto;
-            }
-
-            .sidebar .menu,
-            .sidebar .menu-title {
-                display: none;
-            }
-
-            .logo {
-                margin-bottom: 0;
-            }
-
-            .main {
-                margin-left: 0;
-                padding: 15px;
-            }
-
-            .header {
-                display: block;
-            }
-
-            .header button {
-                margin-top: 12px;
-            }
-
-            .stats {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-            }
-
-            .card, .panel {
-                padding: 16px;
-            }
-        }
-    </style>
+@media(max-width:680px){
+.sidebar{position:static;width:100%;height:auto;padding:17px}
+.sidebar .brand{margin:0 8px 14px}
+.nav{display:flex;overflow-x:auto}
+.menu-label{display:none}
+.nav a{white-space:nowrap}
+.main{margin:0;padding:16px}
+.topbar{align-items:flex-start;flex-direction:column}
+.stats{gap:10px}
+.card,.panel{padding:16px}
+.case-form{grid-template-columns:1fr}
+.case-form .full{grid-column:auto}
+}
+</style>
 </head>
-
 <body>
 
-    <aside class="sidebar">
+<section id="loginPage">
+<form class="login-card" id="loginForm">
+<div class="brand"><span>Q</span> QUBIX</div>
+<p class="muted">Surveillance Forensic Workspace</p>
+<h1>Investigator Login</h1>
+<p class="muted">Enter your name to open your workspace.</p>
 
-        <div class="logo">
-            <span>Q</span> QUBIX
+<div class="field">
+<label for="investigatorName">Investigator Name</label>
+<input id="investigatorName" placeholder="Enter your name" required>
+</div>
+
+<div class="field">
+<label for="investigatorId">Investigator ID (optional)</label>
+<input id="investigatorId" placeholder="e.g. INV-001">
+</div>
+
+<button class="primary" type="submit" style="width:100%;padding:14px">Login to Dashboard</button>
+<p class="muted" style="margin-top:20px">Local login for this browser session.</p>
+</form>
+</section>
+
+<div id="app" class="hidden">
+
+<aside class="sidebar">
+<div class="brand"><span>Q</span> QUBIX</div>
+<div class="menu-label">WORKSPACE</div>
+<nav class="nav">
+<a class="active" data-page="dashboard">▦ Dashboard</a>
+<a data-page="cases">▣ Cases</a>
+<a data-page="evidence">⇧ Evidence Upload</a>
+<a data-page="video">▷ Video Enhancement</a>
+<a data-page="integrity">⬡ Integrity Check</a>
+<a data-page="reports">▤ Reports</a>
+</nav>
+<div class="menu-label">ACCOUNT</div>
+<nav class="nav"><a id="logoutBtn">↪ Logout</a></nav>
+</aside>
+
+<main class="main">
+<header class="topbar">
+<div>
+<p class="eyebrow">QUBIX / WORKSPACE</p>
+<h1 id="welcomeTitle">Hello, Investigator</h1>
+<p class="muted">Manage investigation cases and surveillance evidence.</p>
+</div>
+<div class="user-chip">
+<span class="avatar" id="userAvatar">I</span>
+<div><strong id="userName">Investigator</strong><div class="small" id="userIdLabel">Investigator</div></div>
+</div>
+</header>
+
+<section class="page active" id="page-dashboard">
+<div class="stats">
+<div class="card"><p>Total Cases</p><div class="metric" id="caseCount">0</div><p>Cases created</p></div>
+<div class="card"><p>Evidence Files</p><div class="metric" id="evidenceCount">0</div><p>Files selected</p></div>
+<div class="card"><p>Integrity Checks</p><div class="metric" id="integrityCount">0</div><p>SHA-256 checks</p></div>
+<div class="card"><p>Reports</p><div class="metric" id="reportCount">0</div><p>Reports downloaded</p></div>
+</div>
+
+<div class="layout">
+<div>
+<section class="panel">
+<div class="panel-head"><h3>Recent Cases</h3><button class="primary" onclick="openPage('cases')">Manage Cases</button></div>
+<div id="recentCases" class="small">No cases created yet.</div>
+</section>
+
+<section class="panel">
+<div class="panel-head"><h3>Evidence Workspace</h3><button class="secondary" onclick="openPage('evidence')">View Evidence</button></div>
+<label class="dropzone" for="fileInput">
+<div class="symbol">⇧</div><strong>Select CCTV Evidence</strong>
+<p class="muted" style="margin:8px 0">Choose video files from your device.</p>
+<span style="color:var(--blue);font-weight:700">Browse Files</span>
+</label>
+</section>
+</div>
+
+<div>
+<section class="panel">
+<div class="panel-head"><h3>Workspace Summary</h3></div>
+<p class="muted">Create cases, add evidence, and use video enhancement controls for visual inspection.</p><br>
+<button class="primary" onclick="openPage('cases')">+ Create a Case</button>
+</section>
+<section class="panel">
+<div class="panel-head"><h3>Recent Activity</h3></div>
+<div id="activityList"><p class="small">No activity yet.</p></div>
+</section>
+</div>
+</div>
+</section>
+
+<section class="page" id="page-cases">
+<h2 class="page-title">Case Management</h2>
+<p class="page-intro">Create, view, update, and remove investigation cases.</p>
+
+<section class="panel">
+<div class="panel-head"><h3 id="caseFormTitle">Create New Case</h3><button class="secondary" onclick="resetCaseForm()">Clear Form</button></div>
+<form id="caseForm" class="case-form">
+<input type="hidden" id="editCaseId">
+<div class="field"><label>Case Title *</label><input id="caseName" required placeholder="e.g. Store CCTV Review"></div>
+<div class="field"><label>Case Reference</label><input id="caseRef" placeholder="e.g. QBX-001"></div>
+<div class="field"><label>Location</label><input id="caseLocation" placeholder="Incident location"></div>
+<div class="field"><label>Status</label><select id="caseStatus"><option>Open</option><option>Under Review</option><option>Closed</option></select></div>
+<div class="field full"><label>Case Notes</label><textarea id="caseNotes" rows="3" placeholder="Brief case notes"></textarea></div>
+<div class="full"><button class="primary" type="submit" id="saveCaseBtn">Save Case</button></div>
+</form>
+</section>
+
+<section class="panel">
+<div class="panel-head"><h3>All Cases</h3><span class="small" id="caseTableCount">0 cases</span></div>
+<div class="table-wrap"><table>
+<thead><tr><th>Reference</th><th>Case Title</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody id="caseTable"><tr><td colspan="5">No cases added.</td></tr></tbody>
+</table></div>
+</section>
+</section>
+
+<section class="page" id="page-evidence">
+<h2 class="page-title">Evidence Upload</h2>
+<p class="page-intro">Select evidence files for local preview in this browser session.</p>
+<section class="panel">
+<label class="dropzone" for="fileInput">
+<div class="symbol">⇧</div><strong>Choose Evidence Files</strong>
+<p class="muted" style="margin:8px 0">Select CCTV video files from your device.</p>
+<span style="color:var(--blue);font-weight:700">Browse Files</span>
+</label>
+<div id="evidenceList"></div>
+</section>
+</section>
+
+<section class="page" id="page-video">
+<h2 class="page-title">Video Enhancement</h2>
+<p class="page-intro">Adjust brightness, contrast, and sharpness for visual inspection.</p>
+
+<div class="video-layout">
+<section class="panel">
+<div class="panel-head"><h3>Video Preview</h3><span class="small" id="videoFileLabel">No video selected</span></div>
+<div class="video-stage" id="videoStage">
+<div class="video-placeholder">Select a video from Evidence Upload</div>
+</div>
+<div class="video-buttons">
+<button class="secondary" onclick="openPage('evidence')">Choose Evidence</button>
+<button class="secondary" onclick="resetEnhancements()">Reset Adjustments</button>
+<button class="primary" onclick="downloadFrame()">Save Current Frame</button>
+</div>
+<p class="muted" style="margin-top:15px">Adjustments affect the preview only. The original evidence file is not modified. Sharpness is a visual approximation, not forensic restoration.</p>
+</section>
+
+<section class="panel">
+<div class="panel-head"><h3>Enhancement Controls</h3></div>
+<div class="control"><label>Brightness <span id="brightnessValue">100%</span></label><input id="brightness" type="range" min="50" max="200" value="100"></div>
+<div class="control"><label>Contrast <span id="contrastValue">100%</span></label><input id="contrast" type="range" min="50" max="200" value="100"></div>
+<div class="control"><label>Sharpness <span id="sharpnessValue">0</span></label><input id="sharpness" type="range" min="0" max="10" value="0"></div>
+<div class="field"><label>Selected Video</label><select id="videoSelect"><option value="">Choose a video</option></select></div>
+<p class="muted">Sharpness is simulated in the browser and does not recover missing image details.</p>
+</section>
+</div>
+</section>
+
+<section class="page" id="page-integrity">
+<h2 class="page-title">Evidence Integrity</h2>
+<p class="page-intro">Calculate a SHA-256 hash for a selected file in your browser.</p>
+<section class="panel">
+<h3>SHA-256 Verification</h3>
+<p class="muted" style="margin:10px 0 20px">A hash helps identify changes to the exact file bytes. It does not prove the source or authenticity of the recording.</p>
+<div class="field"><label>Select Evidence File</label><select id="hashSelect"><option value="">Choose evidence</option></select></div>
+<button class="primary" onclick="calculateHash()">Calculate SHA-256</button>
+<div class="field"><label>SHA-256 Result</label><textarea id="hashResult" rows="4" readonly placeholder="Hash result appears here"></textarea></div>
+</section>
+</section>
+
+<section class="page" id="page-reports">
+<h2 class="page-title">Reports</h2>
+<p class="page-intro">Generate and download a simple case summary.</p>
+<section class="panel">
+<div class="field"><label>Choose Case</label><select id="reportCase"><option value="">Select a case</option></select></div>
+<button class="primary" onclick="generateReport()">Generate & Download Report</button>
+</section>
+</section>
+
+<footer>Qubix Forensic Analysis Workspace</footer>
+</main>
+</div>
+
+
+<input type="file" id="fileInput" accept="video/*,.dav,.264,.265,.mp4,.mkv,.avi,.mov" multiple hidden>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let investigator = null;
+let cases = [];
+let evidence = [];
+let activity = [];
+let integrityChecks = 0;
+let reports = 0;
+let activeVideoUrl = null;
+
+$('loginForm').addEventListener('submit', e => {
+    e.preventDefault();
+
+    const name = $('investigatorName').value.trim();
+    if (!name) return;
+
+    investigator = {
+        name,
+        id: $('investigatorId').value.trim() || 'Investigator'
+    };
+
+    $('loginPage').classList.add('hidden');
+    $('app').classList.remove('hidden');
+
+    $('welcomeTitle').textContent = 'Hello, ' + name;
+    $('userName').textContent = name;
+    $('userIdLabel').textContent = investigator.id;
+    $('userAvatar').textContent = name.charAt(0).toUpperCase();
+
+    addActivity('Investigator ' + name + ' logged in');
+});
+
+$('logoutBtn').addEventListener('click', () => {
+    if (activeVideoUrl) URL.revokeObjectURL(activeVideoUrl);
+
+    $('app').classList.add('hidden');
+    $('loginPage').classList.remove('hidden');
+
+    $('investigatorName').value = investigator ? investigator.name : '';
+});
+
+document.querySelectorAll('[data-page]').forEach(a => {
+    a.addEventListener('click', () => openPage(a.dataset.page));
+});
+
+function openPage(name) {
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+    });
+
+    const page = $('page-' + name);
+    if (page) page.classList.add('active');
+
+    document.querySelectorAll('[data-page]').forEach(a => {
+        a.classList.toggle('active', a.dataset.page === name);
+    });
+}
+
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        "'":'&#39;'
+    }[c]));
+}
+
+function addActivity(message) {
+    activity.unshift({
+        message,
+        time: new Date().toLocaleTimeString([], {
+            hour:'2-digit',
+            minute:'2-digit'
+        })
+    });
+
+    activity = activity.slice(0, 8);
+
+    $('activityList').innerHTML = activity.map(a => `
+        <div class="activity">
+            <span class="dot"></span>
+            <span>${escapeHtml(a.message)}
+            <br><span class="small">${a.time}</span></span>
         </div>
+    `).join('');
+}
 
-        <div class="menu-title">WORKSPACE</div>
+/* CASE MANAGEMENT */
 
-        <nav class="menu">
-            <a class="active" onclick="showSection('dashboard', this)">
-                ▦ &nbsp; Dashboard
-            </a>
+$('caseForm').addEventListener('submit', e => {
+    e.preventDefault();
 
-            <a onclick="showSection('cases', this)">
-                ▣ &nbsp; Cases
-            </a>
+    const editId = $('editCaseId').value;
 
-            <a onclick="showSection('evidence', this)">
-                ⇧ &nbsp; Evidence Upload
-            </a>
+    const data = {
+        id: editId || ('CASE-' + Date.now()),
+        ref: $('caseRef').value.trim() ||
+            ('QBX-' + String(cases.length + 1).padStart(3,'0')),
+        name: $('caseName').value.trim(),
+        location: $('caseLocation').value.trim() || 'Not specified',
+        status: $('caseStatus').value,
+        notes: $('caseNotes').value.trim(),
+        updated: new Date().toLocaleDateString()
+    };
 
-            <a onclick="showSection('video', this)">
-                ▷ &nbsp; Video Analysis
-            </a>
+    if (!data.name) return;
 
-            <a onclick="showSection('integrity', this)">
-                ⬡ &nbsp; Integrity Check
-            </a>
+    if (editId) {
+        const i = cases.findIndex(c => c.id === editId);
+        if (i >= 0) cases[i] = data;
+        addActivity('Case updated: ' + data.name);
+    } else {
+        cases.unshift(data);
+        addActivity('Case created: ' + data.name);
+    }
 
-            <a onclick="showSection('reports', this)">
-                ▤ &nbsp; Reports
-            </a>
-        </nav>
+    resetCaseForm();
+    renderCases();
+});
 
-        <div class="menu-title">SYSTEM</div>
+function resetCaseForm() {
+    $('caseForm').reset();
+    $('editCaseId').value = '';
+    $('caseFormTitle').textContent = 'Create New Case';
+    $('saveCaseBtn').textContent = 'Save Case';
+}
 
-        <nav class="menu">
-            <a onclick="showSection('settings', this)">
-                ⚙ &nbsp; Settings
-            </a>
-        </nav>
+function renderCases() {
+    $('caseCount').textContent = cases.length;
+    $('caseTableCount').textContent = cases.length + ' cases';
 
-    </aside>
+    $('caseTable').innerHTML = cases.length ? cases.map(c => `
+        <tr>
+            <td>${escapeHtml(c.ref)}</td>
+            <td><strong>${escapeHtml(c.name)}</strong>
+                <div class="small">${escapeHtml(c.updated)}</div>
+            </td>
+            <td>${escapeHtml(c.location)}</td>
+            <td><span class="pill">${escapeHtml(c.status)}</span></td>
+            <td>
+                <div class="actions">
+                    <button class="secondary" onclick="viewCase('${c.id}')">View</button>
+                    <button class="secondary" onclick="editCase('${c.id}')">Edit</button>
+                    <button class="danger" onclick="deleteCase('${c.id}')">Delete</button>
+                </div>
+            </td>
+        </tr>
+    `).join('') : '<tr><td colspan="5">No cases added.</td></tr>';
 
-    <main class="main">
-
-        <header class="header">
-            <div>
-                <p class="subtitle">QUBIX / WORKSPACE</p>
-                <h1 id="pageTitle">Forensic Dashboard</h1>
-                <p class="subtitle">
-                    Manage cases and surveillance evidence.
-                </p>
+    $('recentCases').innerHTML = cases.length ? cases.slice(0,4).map(c => `
+        <div class="case-row">
+            <span class="case-symbol">▣</span>
+            <div class="case-info">
+                <strong>${escapeHtml(c.name)}</strong>
+                <span class="small">${escapeHtml(c.ref)} · ${escapeHtml(c.location)}</span>
             </div>
+            <span class="pill">${escapeHtml(c.status)}</span>
+        </div>
+    `).join('') : '<p class="small">No cases created yet.</p>';
 
-            <div>
-                <button class="secondary"
-                    onclick="document.getElementById('fileInput').click()">
-                    + Add Evidence
-                </button>
+    $('reportCase').innerHTML =
+        '<option value="">Select a case</option>' +
+        cases.map(c => `<option value="${c.id}">${escapeHtml(c.ref + ' - ' + c.name)}</option>`).join('');
+}
 
-                <button class="primary" onclick="newCase()">
-                    + New Case
-                </button>
+function viewCase(id) {
+    const c = cases.find(x => x.id === id);
+    if (!c) return;
+
+    alert(
+        'Case: ' + c.name +
+        '\nReference: ' + c.ref +
+        '\nLocation: ' + c.location +
+        '\nStatus: ' + c.status +
+        '\nNotes: ' + (c.notes || 'No notes')
+    );
+}
+
+function editCase(id) {
+    const c = cases.find(x => x.id === id);
+    if (!c) return;
+
+    $('editCaseId').value = c.id;
+    $('caseName').value = c.name;
+    $('caseRef').value = c.ref;
+    $('caseLocation').value = c.location;
+    $('caseStatus').value = c.status;
+    $('caseNotes').value = c.notes;
+
+    $('caseFormTitle').textContent = 'Edit Case';
+    $('saveCaseBtn').textContent = 'Update Case';
+
+    openPage('cases');
+    window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function deleteCase(id) {
+    const c = cases.find(x => x.id === id);
+    if (!c) return;
+
+    if (!confirm('Delete case "' + c.name + '"?')) return;
+
+    cases = cases.filter(x => x.id !== id);
+    addActivity('Case deleted: ' + c.name);
+    renderCases();
+}
+
+/* EVIDENCE UPLOAD */
+
+$('fileInput').addEventListener('change', e => {
+    Array.from(e.target.files).forEach(file => {
+        evidence.push({
+            id: 'EV-' + Date.now() + '-' + Math.random().toString(16).slice(2),
+            file,
+            name: file.name,
+            size: file.size,
+            type: file.type
+        });
+
+        addActivity('Evidence selected: ' + file.name);
+    });
+
+    e.target.value = '';
+    renderEvidence();
+});
+
+function renderEvidence() {
+    $('evidenceCount').textContent = evidence.length;
+
+    $('evidenceList').innerHTML = evidence.map(item => `
+        <div class="file-row">
+            <span class="case-symbol">▤</span>
+            <div class="case-info">
+                <strong>${escapeHtml(item.name)}</strong>
+                <span class="small">${(item.size / 1048576).toFixed(2)} MB</span>
             </div>
-        </header>
-
-        <section id="dashboard">
-
-            <div class="stats">
-
-                <div class="card">
-                    <p>Total Cases</p>
-                    <div class="number" id="caseCount">0</div>
-                    <p>Cases created</p>
-                </div>
-
-                <div class="card">
-                    <p>Evidence Files</p>
-                    <div class="number" id="evidenceCount">0</div>
-                    <p>Files selected</p>
-                </div>
-
-                <div class="card">
-                    <p>Integrity Checked</p>
-                    <div class="number" id="integrityCount">0</div>
-                    <p>Files verified</p>
-                </div>
-
-                <div class="card">
-                    <p>Reports Generated</p>
-                    <div class="number" id="reportCount">0</div>
-                    <p>Reports created</p>
-                </div>
-
+            <div class="actions">
+                <button class="secondary" onclick="previewEvidence('${item.id}')">Preview</button>
+                <button class="danger" onclick="removeEvidence('${item.id}')">Remove</button>
             </div>
+        </div>
+    `).join('') || '<p class="small">No evidence selected.</p>';
 
-            <div class="content">
+    const options = evidence.map(item =>
+        `<option value="${item.id}">${escapeHtml(item.name)}</option>`
+    ).join('');
 
-                <div>
+    $('videoSelect').innerHTML = '<option value="">Choose a video</option>' + options;
+    $('hashSelect').innerHTML = '<option value="">Choose evidence</option>' + options;
+}
 
-                    <section class="panel">
-                        <div class="panel-header">
-                            <h3>Recent Cases</h3>
-                            <span class="small">Case Management</span>
-                        </div>
+function removeEvidence(id) {
+    const item = evidence.find(x => x.id === id);
+    if (!item) return;
 
-                        <div id="caseList">
-                            <p class="small">
-                                No cases created yet. Click New Case to begin.
-                            </p>
-                        </div>
-                    </section>
+    evidence = evidence.filter(x => x.id !== id);
 
-                    <section class="panel">
-                        <div class="panel-header">
-                            <h3>Evidence Workspace</h3>
-                        </div>
+    addActivity('Evidence removed: ' + item.name);
+    renderEvidence();
+}
 
-                        <label class="upload-area" for="fileInput">
-                            <div class="upload-icon">⇧</div>
-                            <h3>Upload CCTV Evidence</h3>
-                            <p>
-                                Select video or evidence files from your device.
-                            </p>
-                            <span style="color:#4557f5;font-weight:bold">
-                                Browse Files
-                            </span>
-                        </label>
+function previewEvidence(id) {
+    const item = evidence.find(x => x.id === id);
+    if (!item) return;
 
-                        <input
-                            type="file"
-                            id="fileInput"
-                            accept="video/*,.dav,.264,.265"
-                            multiple
-                            hidden
-                            onchange="uploadFiles(this.files)"
-                        >
+    if (!item.type.startsWith('video/')) {
+        alert('This file is not recognized as a browser video. Vendor-specific DVR formats may require a decoder.');
+        return;
+    }
 
-                        <div id="fileList"></div>
-                    </section>
+    $('videoSelect').value = id;
+    loadVideo(item);
+    openPage('video');
+}
 
-                </div>
+/* VIDEO ENHANCEMENT */
 
-                <div>
+$('videoSelect').addEventListener('change', () => {
+    const item = evidence.find(x => x.id === $('videoSelect').value);
+    if (item) loadVideo(item);
+});
 
-                    <section class="panel">
-                        <div class="panel-header">
-                            <h3>Case Progress</h3>
-                        </div>
+function loadVideo(item) {
+    if (!item.type.startsWith('video/')) {
+        alert('This format may not be playable in your browser.');
+        return;
+    }
 
-                        <p class="small">Evidence review progress</p>
+    if (activeVideoUrl) URL.revokeObjectURL(activeVideoUrl);
 
-                        <div class="progress">
-                            <div></div>
-                        </div>
+    activeVideoUrl = URL.createObjectURL(item.file);
 
-                        <p class="small">
-                            Progress will be updated as case features are added.
-                        </p>
-                    </section>
+    $('videoStage').innerHTML = '';
 
-                    <section class="panel">
-                        <div class="panel-header">
-                            <h3>Recent Activity</h3>
-                        </div>
+    const video = document.createElement('video');
+    video.id = 'videoPlayer';
+    video.controls = true;
+    video.src = activeVideoUrl;
+    video.style.width = '100%';
+    video.style.maxHeight = '480px';
+    video.style.filter = filterString();
 
-                        <div id="activityList">
-                            <p class="small">No recent activity.</p>
-                        </div>
-                    </section>
+    $('videoStage').appendChild(video);
+    $('videoFileLabel').textContent = item.name;
 
-                    <section class="panel">
-                        <div class="panel-header">
-                            <h3>Evidence Integrity</h3>
-                        </div>
+    addActivity('Video loaded: ' + item.name);
+}
 
-                        <p class="small">
-                            Verify evidence integrity using SHA-256 hashing.
-                            A backend connection is required for actual
-                            hash calculation.
-                        </p>
+['brightness','contrast','sharpness'].forEach(id => {
+    $(id).addEventListener('input', applyFilters);
+});
 
-                        <br>
+function filterString() {
+    const b = +$('brightness').value;
+    const c = +$('contrast').value;
+    const s = +$('sharpness').value;
 
-                        <button class="secondary"
-                            onclick="showSection('integrity')">
-                            Open Integrity Check
-                        </button>
-                    </section>
+    return `brightness(${b}%) contrast(${c+s*2}%) drop-shadow(0 0 ${s*0.15}px rgba(255,255,255,0.25))`;
+}
 
-                </div>
+function applyFilters() {
+    $('brightnessValue').textContent = $('brightness').value + '%';
+    $('contrastValue').textContent = $('contrast').value + '%';
+    $('sharpnessValue').textContent = $('sharpness').value;
 
-            </div>
+    const video = $('videoPlayer');
+    if (video) video.style.filter = filterString();
+}
 
-        </section>
+function resetEnhancements() {
+    $('brightness').value = 100;
+    $('contrast').value = 100;
+    $('sharpness').value = 0;
+    applyFilters();
+}
 
-        <section id="otherSection" style="display:none">
-            <div class="panel">
-                <h3 id="sectionHeading">Section</h3>
-                <br>
-                <p class="subtitle" id="sectionDescription"></p>
-                <br>
-                <button class="secondary"
-                    onclick="showSection('dashboard')">
-                    Back to Dashboard
-                </button>
-            </div>
-        </section>
+function downloadFrame() {
+    const video = $('videoPlayer');
 
-        <footer>
-            Qubix Forensic Analysis Tool
-        </footer>
+    if (!video || !video.videoWidth) {
+        alert('Load a supported video first.');
+        return;
+    }
 
-    </main>
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
-    <script>
+    const ctx = canvas.getContext('2d');
 
-        let caseNumber = 1;
-        let evidenceNumber = 0;
-        let integrityNumber = 0;
-        let reportNumber = 0;
+    ctx.filter = `brightness(${$('brightness').value}%) contrast(${$('contrast').value}%)`;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        function newCase() {
-
-            let name = prompt("Enter the case name:");
-
-            if (name === null || name.trim() === "") {
-                return;
-            }
-
-            let caseList = document.getElementById("caseList");
-
-            if (caseNumber === 1) {
-                caseList.innerHTML = "";
-            }
-
-            let caseId = "CASE-" +
-                String(caseNumber).padStart(3, "0");
-
-            let div = document.createElement("div");
-            div.className = "case";
-
-            let icon = document.createElement("span");
-            icon.className = "case-icon";
-            icon.textContent = "▣";
-
-            let info = document.createElement("div");
-            info.className = "case-info";
-
-            let title = document.createElement("strong");
-            title.textContent = caseId + " - " + name;
-
-            let details = document.createElement("span");
-            details.className = "small";
-            details.textContent = "Created just now";
-
-            info.appendChild(title);
-            info.appendChild(details);
-
-            let status = document.createElement("span");
-            status.className = "status";
-            status.textContent = "New";
-
-            div.appendChild(icon);
-            div.appendChild(info);
-            div.appendChild(status);
-
-            caseList.prepend(div);
-
-            caseNumber++;
-
-            document.getElementById("caseCount").textContent =
-                caseNumber - 1;
-
-            addActivity("New case created: " + name);
+    canvas.toBlob(blob => {
+        if (!blob) {
+            alert('Could not save this frame.');
+            return;
         }
 
-        function uploadFiles(files) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'qubix-enhanced-frame.png';
+        a.click();
 
-            let fileList = document.getElementById("fileList");
+        URL.revokeObjectURL(url);
+    });
+}
 
-            for (let file of files) {
+/* SHA-256 INTEGRITY CHECK */
 
-                let div = document.createElement("div");
-                div.className = "case";
+async function calculateHash() {
+    const item = evidence.find(x => x.id === $('hashSelect').value);
 
-                let icon = document.createElement("span");
-                icon.className = "case-icon";
-                icon.textContent = "▤";
+    if (!item) {
+        alert('Please select an evidence file.');
+        return;
+    }
 
-                let info = document.createElement("div");
-                info.className = "case-info";
+    if (!crypto.subtle) {
+        alert('SHA-256 requires localhost or HTTPS.');
+        return;
+    }
 
-                let title = document.createElement("strong");
-                title.textContent = file.name;
+    $('hashResult').value = 'Calculating...';
 
-                let details = document.createElement("span");
-                details.className = "small";
+    try {
+        const buffer = await item.file.arrayBuffer();
+        const digest = await crypto.subtle.digest('SHA-256', buffer);
 
-                details.textContent =
-                    (file.size / (1024 * 1024)).toFixed(2) +
-                    " MB · Selected locally";
+        const hash = Array.from(new Uint8Array(digest))
+            .map(b => b.toString(16).padStart(2,'0'))
+            .join('');
 
-                info.appendChild(title);
-                info.appendChild(details);
+        $('hashResult').value = hash;
 
-                let status = document.createElement("span");
-                status.className = "status";
-                status.textContent = "Selected";
+        integrityChecks++;
+        $('integrityCount').textContent = integrityChecks;
 
-                div.appendChild(icon);
-                div.appendChild(info);
-                div.appendChild(status);
+        addActivity('SHA-256 calculated for ' + item.name);
+    } catch (err) {
+        $('hashResult').value = 'Hash calculation failed: ' + err.message;
+    }
+}
 
-                fileList.prepend(div);
+/* CASE REPORT */
 
-                evidenceNumber++;
+function generateReport() {
+    const c = cases.find(x => x.id === $('reportCase').value);
 
-                addActivity("Evidence selected: " + file.name);
-            }
+    if (!c) {
+        alert('Please select a case.');
+        return;
+    }
 
-            document.getElementById("evidenceCount").textContent =
-                evidenceNumber;
+    const report = `QUBIX - CASE SUMMARY
 
-            document.getElementById("fileInput").value = "";
-        }
+Investigator: ${investigator ? investigator.name : 'Not specified'}
+Investigator ID: ${investigator ? investigator.id : 'Not specified'}
 
-        function addActivity(message) {
+Case Reference: ${c.ref}
+Case Title: ${c.name}
+Location: ${c.location}
+Status: ${c.status}
+Date: ${c.updated}
 
-            let activityList =
-                document.getElementById("activityList");
+Case Notes:
+${c.notes || 'None'}
 
-            if (activityList.querySelector(".small")) {
-                activityList.innerHTML = "";
-            }
+Evidence files selected in this browser session: ${evidence.length}
 
-            let div = document.createElement("div");
-            div.className = "activity";
+Report generated: ${new Date().toLocaleString()}
 
-            let dot = document.createElement("span");
-            dot.className = "dot";
+Note: This summary is generated from information entered in the frontend. It is not a certified forensic report.`;
 
-            let text = document.createElement("span");
-            text.textContent = message;
+    const blob = new Blob([report], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
 
-            div.appendChild(dot);
-            div.appendChild(text);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = c.ref + '_case-summary.txt';
+    a.click();
 
-            activityList.prepend(div);
-        }
+    URL.revokeObjectURL(url);
 
-        function showSection(section, element) {
+    reports++;
+    $('reportCount').textContent = reports;
 
-            document.querySelectorAll(".menu a").forEach(link => {
-                link.classList.remove("active");
-            });
-
-            if (element) {
-                element.classList.add("active");
-            }
-
-            let dashboard = document.getElementById("dashboard");
-            let otherSection = document.getElementById("otherSection");
-
-            if (section === "dashboard") {
-
-                dashboard.style.display = "block";
-                otherSection.style.display = "none";
-
-                document.getElementById("pageTitle").textContent =
-                    "Forensic Dashboard";
-
-                return;
-            }
-
-            dashboard.style.display = "none";
-            otherSection.style.display = "block";
-
-            let titles = {
-                cases: "Case Management",
-                evidence: "Evidence Upload",
-                video: "Video Analysis",
-                integrity: "Evidence Integrity",
-                reports: "Forensic Reports",
-                settings: "Settings"
-            };
-
-            let descriptions = {
-                cases: "Create and organize investigation cases.",
-                evidence: "Select surveillance files for your case.",
-                video: "Video processing and examination features can be connected here.",
-                integrity: "SHA-256 evidence verification requires backend implementation.",
-                reports: "Generate and manage forensic examination reports.",
-                settings: "Application settings and preferences."
-            };
-
-            document.getElementById("pageTitle").textContent =
-                titles[section] || "Workspace";
-
-            document.getElementById("sectionHeading").textContent =
-                titles[section] || "Workspace";
-
-            document.getElementById("sectionDescription").textContent =
-                descriptions[section] || "";
-        }
-
-    </script>
+    addActivity('Report downloaded for ' + c.name);
+}
+</script>
 
 </body>
 </html>
