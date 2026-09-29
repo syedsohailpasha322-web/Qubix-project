@@ -304,24 +304,38 @@ let integrityChecks = 0;
 let reports = 0;
 let activeVideoUrl = null;
 
+
 $('loginForm').addEventListener('submit', e => {
     e.preventDefault();
 
     const name = $('investigatorName').value.trim();
-    if (!name) return;
+    const id = $('investigatorId').value.trim();
 
+    if (!name) {
+        alert('Please enter your name.');
+        return;
+    }
+
+    if (!id) {
+        alert('Please enter your Investigator ID.');
+        return;
+    }
+
+    // Store the current investigator
     investigator = {
-        name,
-        id: $('investigatorId').value.trim() || 'Investigator'
+        name: name,
+        id: id
     };
 
-    $('loginPage').classList.add('hidden');
-    $('app').classList.remove('hidden');
-
+    // Display the actual entered details
     $('welcomeTitle').textContent = 'Hello, ' + name;
     $('userName').textContent = name;
-    $('userIdLabel').textContent = investigator.id;
+    $('userIdLabel').textContent = 'ID: ' + id;
     $('userAvatar').textContent = name.charAt(0).toUpperCase();
+
+    // Open dashboard
+    $('loginPage').classList.add('hidden');
+    $('app').classList.remove('hidden');
 
     addActivity('Investigator ' + name + ' logged in');
 });
